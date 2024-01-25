@@ -1,35 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import './App.css';
+import qr from 'qrcode';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
+
+  useEffect(() => {
+    // Generate QR code as a data URL
+    qr.toDataURL('Test', (err, url) => {
+      if (err) throw err;
+      setQrCodeDataUrl(url);
+    });
+  }, []); // Run the effect only once on component mount
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
+      <h1>Wormhole</h1>
+
+      {qrCodeDataUrl && (
+        <div className="qr-code-container">
+          <img src={qrCodeDataUrl} alt="QR Code" />
+        </div>
+      )}
+
       <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+        Scan QR Code to transfer Files!
       </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
