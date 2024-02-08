@@ -6,7 +6,6 @@ function App() {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
   const timeoutRef = useRef(null);
 
-  //Random string generation for testing purposes
   const generateRandomString = (length = 10) => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
@@ -17,12 +16,15 @@ function App() {
   };
 
   const generateQRCode = () => {
-    const randomString = generateRandomString();
+    if (qrCodeDataUrl && !window.confirm("A QR code is already generated. Do you want to create a new one?")) {
+      return;
+    }
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
 
+    const randomString = generateRandomString();
     qr.toDataURL(randomString, (err, url) => {
       if (err) throw err;
       setQrCodeDataUrl(url);
@@ -30,7 +32,7 @@ function App() {
       timeoutRef.current = setTimeout(() => {
         setQrCodeDataUrl('');
         timeoutRef.current = null;
-      }, 1000);
+      }, 600000);
     });
   };
 
