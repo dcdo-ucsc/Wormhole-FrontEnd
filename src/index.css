@@ -13,6 +13,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.qr-code-container{
+  margin-top: 10px;
+}
+
 a {
   font-weight: 500;
   color: #646cff;

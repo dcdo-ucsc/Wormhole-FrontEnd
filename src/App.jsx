@@ -1,22 +1,44 @@
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import './App.css';
 import qr from 'qrcode';
 
 function App() {
-  const [count, setCount] = useState(0);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
+  const timeoutRef = useRef(null);
 
-  useEffect(() => {
-    // Generate QR code as a data URL
-    qr.toDataURL('Test', (err, url) => {
+  //Random string generation for testing purposes
+  const generateRandomString = (length = 10) => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+  };
+
+  const generateQRCode = () => {
+    const randomString = generateRandomString();
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    qr.toDataURL(randomString, (err, url) => {
       if (err) throw err;
       setQrCodeDataUrl(url);
+
+      timeoutRef.current = setTimeout(() => {
+        setQrCodeDataUrl('');
+        timeoutRef.current = null;
+      }, 1000);
     });
-  }, []); // Run the effect only once on component mount
+  };
 
   return (
     <>
       <h1>Wormhole</h1>
+
+      <button onClick={generateQRCode}>Generate QR Code</button>
 
       {qrCodeDataUrl && (
         <div className="qr-code-container">
