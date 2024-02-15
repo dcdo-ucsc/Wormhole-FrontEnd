@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import './App.css';
 import qr from 'qrcode';
 
-const backend = 'http://localhost:3000'
+const backend = 'http://localhost:3000';
 
 function App() {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
@@ -12,8 +12,17 @@ function App() {
   const intervalRef = useRef(null);
 
   useEffect(() => {
+    // Read session ID from URL when component mounts
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('sessionId');
+    if (sessionId) {
+      const generatedSessionUrl = `${window.location.origin}/session/${sessionId}`;
+      setSessionUrl(generatedSessionUrl);
+    }
+  }, []);
+
+  useEffect(() => {
     if (sessionUrl) {
-      // Generate QR code when sessionUrl changes
       qr.toDataURL(sessionUrl, { errorCorrectionLevel: 'H' }, (err, url) => {
         if (err) {
           console.error('Error generating QR code:', err);
@@ -22,8 +31,7 @@ function App() {
         setQrCodeDataUrl(url);
         setTimer(600); // 10 minutes in seconds
 
-        // Set a timeout to clear the QR code and session URL after 10 minutes
-        clearTimeout(timeoutRef.current); // Clear any existing timeout
+        clearTimeout(timeoutRef.current);
         timeoutRef.current = setTimeout(() => {
           setQrCodeDataUrl('');
           setSessionUrl('');
@@ -41,14 +49,15 @@ function App() {
     clearTimeout(timeoutRef.current);
     clearInterval(intervalRef.current);
 
-    // Make a request to the backend to create a new session
     const response = await fetch(backend + '/session', { method: 'GET', redirect: 'manual' });
     const data = await response.json();
     const sessionId = data.sessionId;
 
-    // Set the session URL state, triggering the useEffect to generate the QR code
     const generatedSessionUrl = `${window.location.origin}/session/${sessionId}`;
     setSessionUrl(generatedSessionUrl);
+
+    // Update URL with session ID
+    window.history.pushState(null, '', `?sessionId=${sessionId}`);
   };
 
   useEffect(() => {
