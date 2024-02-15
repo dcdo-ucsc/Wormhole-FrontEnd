@@ -2,45 +2,53 @@ import { useState, useEffect, useRef } from 'react';
 import './App.css';
 import qr from 'qrcode';
 
+const backend = 'http://localhost:3000'
+
 function App() {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
+  const [sessionUrl, setSessionUrl] = useState('');
   const [timer, setTimer] = useState(0);
   const timeoutRef = useRef(null);
   const intervalRef = useRef(null);
 
-  const generateRandomString = (length = 10) => {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return result;
-  };
+  useEffect(() => {
+    if (sessionUrl) {
+      // Generate QR code when sessionUrl changes
+      qr.toDataURL(sessionUrl, { errorCorrectionLevel: 'H' }, (err, url) => {
+        if (err) {
+          console.error('Error generating QR code:', err);
+          return;
+        }
+        setQrCodeDataUrl(url);
+        setTimer(600); // 10 minutes in seconds
 
-  const generateQRCode = () => {
+        // Set a timeout to clear the QR code and session URL after 10 minutes
+        clearTimeout(timeoutRef.current); // Clear any existing timeout
+        timeoutRef.current = setTimeout(() => {
+          setQrCodeDataUrl('');
+          setSessionUrl('');
+          setTimer(0);
+        }, 600000); // 10 minutes
+      });
+    }
+  }, [sessionUrl]);
+
+  const createSessionAndGenerateQR = async () => {
     if (qrCodeDataUrl && !window.confirm("A QR code is already generated. Do you want to create a new one?")) {
       return;
     }
 
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
+    clearTimeout(timeoutRef.current);
+    clearInterval(intervalRef.current);
 
-    const randomString = generateRandomString();
-    qr.toDataURL(randomString, (err, url) => {
-      if (err) throw err;
-      setQrCodeDataUrl(url);
-      setTimer(600); // 10 minutes in seconds
+    // Make a request to the backend to create a new session
+    const response = await fetch(backend + '/session', { method: 'GET', redirect: 'manual' });
+    const data = await response.json();
+    const sessionId = data.sessionId;
 
-      timeoutRef.current = setTimeout(() => {
-        setQrCodeDataUrl('');
-        setTimer(0);
-        timeoutRef.current = null;
-      }, 600000); // 10 minutes
-    });
+    // Set the session URL state, triggering the useEffect to generate the QR code
+    const generatedSessionUrl = `${window.location.origin}/session/${sessionId}`;
+    setSessionUrl(generatedSessionUrl);
   };
 
   useEffect(() => {
@@ -48,7 +56,7 @@ function App() {
       intervalRef.current = setInterval(() => {
         setTimer((prevTimer) => prevTimer - 1);
       }, 1000);
-    } else if (intervalRef.current) {
+    } else {
       clearInterval(intervalRef.current);
     }
 
@@ -64,18 +72,17 @@ function App() {
   return (
     <>
       <h1>Wormhole</h1>
-
-      <button onClick={generateQRCode}>Generate QR Code</button>
-
+      <button onClick={createSessionAndGenerateQR}>Generate QR Code</button>
       {qrCodeDataUrl && (
         <div className="qr-code-container">
           <img src={qrCodeDataUrl} alt="QR Code" />
+          <p>Session URL: <a href={sessionUrl} target="_blank" rel="noopener noreferrer">{sessionUrl}</a></p>
           <p>Expires in {formatTime()}</p>
         </div>
       )}
 
       <p className="read-the-docs">
-        Scan QR Code to transfer Files!
+        Scan QR Code to transfer files!
       </p>
     </>
   );
