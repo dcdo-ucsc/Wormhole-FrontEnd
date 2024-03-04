@@ -8,11 +8,9 @@ import qs from "qs";
 const backend = "http://localhost:9001";
 
 const createSession = async (expiry, password) => {
-  // const createSession = async (expiry, password, userId) => {
   let data = qs.stringify({
     expiry,
     password,
-    // userId,
   });
 
   const res = await axios.post(backend + "/api/session/create", data, {
