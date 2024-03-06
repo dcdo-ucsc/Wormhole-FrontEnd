@@ -19,13 +19,9 @@
     "qs": "^6.11.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-<<<<<<< HEAD
     "react-router-dom": "^6.22.2",
     "router-dom": "^2.2.11",
     "uuid": "^9.0.1"
-=======
-    "react-router-dom": "^6.22.2"
->>>>>>> 7db4075d22a0b23e06420657f2d9cc9f5db16602
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
