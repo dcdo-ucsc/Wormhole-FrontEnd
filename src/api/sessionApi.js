@@ -5,7 +5,7 @@ https://github.com/dcdo-ucsc/Wormhole-Backend/blob/master/API_DOCS.md
 import axios from "axios";
 import qs from "qs";
 
-const backend = "http://localhost:9001";
+const backend = import.meta.env.VITE_BACKEND;
 
 const createSession = async (expiry, password) => {
   let data = qs.stringify({

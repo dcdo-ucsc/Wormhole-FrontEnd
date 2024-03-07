@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const backend = "http://localhost:9001";
+const backend = import.meta.env.VITE_BACKEND;
 
 const generateUserId = async () => {
   const res = await axios.get(backend + "/api/user/generate", {
