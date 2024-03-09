@@ -1,0 +1,35 @@
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 8px;
+  border-radius: 8px;
+  border-style: dashed;
+  border-width: 1px;
+  border-color: whitesmoke;
+  padding: 10px 6px;
+}
+
+.upload-form-label {
+  position: relative;
+  cursor: pointer;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.upload-label:focus-within {
+  box-shadow: 0 0 0 2px #6366f1;
+}
+
+.upload-label:hover {
+  color: var(--text-color-hover);
+}
+
+.text-center {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}

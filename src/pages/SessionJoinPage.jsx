@@ -30,6 +30,8 @@ const SessionJoinPage = ({ DOMAIN }) => {
   }, []);
 
   const GoToSession = () => {
+    // TODO: add endpoint in backend to check if session exists
+    // if not, show error message
     window.location.assign(`${DOMAIN}/session/${sessionId}`);
   };
 
