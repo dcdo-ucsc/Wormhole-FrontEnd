@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import Button from '@mui/material/Button';
 import './index.css';
 
+import { CustomButton } from './button';
 import { uploadFiles } from '../api/fileApi';
 import { fileUpload, uploadSvg } from '../assets/svg/fileUpload';
 
@@ -31,7 +31,14 @@ const UploadForm = (sessionId) => {
   };
 
   const handleUpload = () => {
+    // Get session token from cookies
+    
+    const sessionToken = document.cookie.includes
     uploadFiles(files, 'sessionToken', files.length);
+  };
+
+  const click = () => {
+    console.log('test')
   };
 
   return (
@@ -69,6 +76,10 @@ const UploadForm = (sessionId) => {
         >
           Upload
         </Button>
+        {/* Create session btn */}
+        <div>
+          <CustomButton onClick={click} title="Create Session" />
+        </div>
       </label>
     </div>
   );

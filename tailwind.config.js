@@ -1,12 +1,17 @@
+import forms from "@tailwindcss/forms";
+
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./src/**/*.{js,jsx,ts,tsx}'],
-  important: '#root',
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  // important: '#root',
   theme: {
     extend: {},
   },
-  plugins: [],
-  corePlugins: {
-    preflight: false,
-  },
+  plugins: [forms],
+  // corePlugins: {
+  //   preflight: false,
+  // },
 };
