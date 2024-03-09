@@ -7,20 +7,23 @@ import FormData from "form-data";
 
 const backend = import.meta.env.VITE_BACKEND;
 
-const uploadFile = async (files, sessionToken, fileCount) => {
+const uploadFiles = async (files, sessionToken, fileCount) => {
   let formData = new FormData();
   files.forEach((file) => {
-    formData.append("files", file);
+    formData.append("file", file);
   });
 
   const res = await axios.post(
-    backend + `/api/session/upload/${fileCount}`,
+    backend + `/api/files/upload`,
     formData,
     {
       withCredentials: true,
       headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${sessionToken}`,
+      },
+      params: {
+        fileCount: fileCount,
       },
     }
   );
@@ -37,4 +40,4 @@ const downloadFile = async (sessionToken) => {
   return res.data;
 };
 
-export { uploadFile, downloadFile };
+export { uploadFiles, downloadFile };

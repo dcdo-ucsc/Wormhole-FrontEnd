@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
 import './index.css';
 
-import { CustomButton } from './button';
 import { uploadFiles } from '../api/fileApi';
 import { fileUpload, uploadSvg } from '../assets/svg/fileUpload';
 
@@ -30,15 +30,12 @@ const UploadForm = (sessionId) => {
     // handle the file here
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     // Get session token from cookies
-    
-    const sessionToken = document.cookie.includes
-    uploadFiles(files, 'sessionToken', files.length);
-  };
 
-  const click = () => {
-    console.log('test')
+    const sessionToken = Cookies.get(`token_${sessionId.sessionId}`);
+    await uploadFiles(files, sessionToken, files.length);
+    console.log('Files uploaded!');
   };
 
   return (
@@ -68,18 +65,7 @@ const UploadForm = (sessionId) => {
       </div>
 
       <label htmlFor='contained-button-file'>
-        <Button
-          variant='contained'
-          color='primary'
-          component='span'
-          onClick={handleUpload}
-        >
-          Upload
-        </Button>
-        {/* Create session btn */}
-        <div>
-          <CustomButton onClick={click} title="Create Session" />
-        </div>
+        <button onClick={handleUpload}>Upload</button>
       </label>
     </div>
   );
