@@ -34,8 +34,17 @@ const UploadForm = (sessionId) => {
     // Get session token from cookies
 
     const sessionToken = Cookies.get(`token_${sessionId.sessionId}`);
-    await uploadFiles(files, sessionToken, files.length);
-    console.log('Files uploaded!');
+
+    try {
+      await uploadFiles(files, sessionToken, files.length);
+      console.log('Files uploaded!');
+    } catch (err) {
+      // empty file if 413 error occurs
+      setFiles([]);
+      console.log('some 413 error occured, either file too big or no file');
+    }
+    // clear files to upload
+    setFiles([]);
   };
 
   return (

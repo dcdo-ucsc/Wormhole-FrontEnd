@@ -28,6 +28,7 @@ const uploadFiles = async (files, sessionToken, fileCount) => {
 
 const downloadFile = async (sessionId, sessionToken) => {
   const res = await axios.get(backend + `/api/files/download`, {
+    responseType: 'blob',
     withCredentials: true,
     headers: {
       Authorization: `Bearer ${sessionToken}`,

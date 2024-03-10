@@ -13,7 +13,7 @@ import { formatTime } from '../utils/time';
 const backend = import.meta.env.VITE_BACKEND;
 
 const SessionPage = () => {
-  const { sessionId } = useParams(); 
+  const { sessionId } = useParams();
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
   const [sessionUrl, setSessionUrl] = useState('');
   const [timer, setTimer] = useState(0);
@@ -27,9 +27,12 @@ const SessionPage = () => {
       }
 
       try {
-        const response = await axios.get(`${backend}/api/session/data/${sessionId}`, {
-          withCredentials: true
-        });
+        const response = await axios.get(
+          `${backend}/api/session/data/${sessionId}`,
+          {
+            withCredentials: true,
+          }
+        );
 
         const { qrCodeDataURL, deletionTime } = response.data;
         setQrCodeDataUrl(qrCodeDataURL);
@@ -88,7 +91,7 @@ const SessionPage = () => {
       console.error('Download Error:', error);
     }
     const fileNameHeader = response.headers['content-disposition'];
-    const fileType = response.headers['Content-Type'];
+    const fileType = response.headers['content-type'];
     const fileNameStart = fileNameHeader.indexOf('"') + 1;
     const fileNameEnd = fileNameHeader.lastIndexOf('"');
     const fileName = fileNameHeader.substring(fileNameStart, fileNameEnd);
@@ -112,14 +115,21 @@ const SessionPage = () => {
       {qrCodeDataUrl && (
         <div className='qr-code-container'>
           <img src={qrCodeDataUrl} alt='QR Code' />
-          <p>Session URL: <a href={sessionUrl} target='_blank' rel='noopener noreferrer'>{sessionUrl}</a></p>
+          <p>
+            Session URL:{' '}
+            <a href={sessionUrl} target='_blank' rel='noopener noreferrer'>
+              {sessionUrl}
+            </a>
+          </p>
           <p>Expires in {formatTime(timer)}</p>
         </div>
       )}
       <p className='read-the-docs'>Scan QR Code to transfer files!</p>
 
       <div className='centerize'>
-        <a href='/' className='primary-button button-imposter'>Back to main app</a>
+        <a href='/' className='primary-button button-imposter'>
+          Back to main app
+        </a>
       </div>
       <div className='upload-container'>
         <UploadForm sessionId={sessionId} />
