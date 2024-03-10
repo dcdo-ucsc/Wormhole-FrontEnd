@@ -37,33 +37,52 @@ const SessionJoinPage = ({ DOMAIN }) => {
 
   return (
     <div>
-      <h1 className='session-title'>Wormhole</h1>
-      <h2 className='session-title'>The file wormhole app</h2>
-      <p className='session-text'>Scan the QR Code from an active session</p>
+      <h1 className='leading-10'>Wormhole</h1>
+      <h2 className='text-indigo-500'>The Seamless File Transfer Web App</h2>
+      <div className='py-12'/>
+
+      {/* <p className='session-text'>Scan the QR Code from an active session</p>
       {sessionJoinerValue ? (
         <div className='qrcode-container'>
           <QRCode value={sessionJoinerValue} />
         </div>
-      ) : null}
-      <p className='session-text'>Or enter in the code below</p>
+      ) : null} */}
+
+      {/* <p className='session-text'>Or enter in the code below</p>
       <h2 className='session-title'>
         {sessionJoinerValue || 'Awaiting join Id'}
-      </h2>
-      <p className='session-text'>Or type in the session id</p>
+      </h2> */}
+      
+      <p className='session-text py-4'>Type in the session id below to join</p>
+      <div>
+        <input
+          className='rounded-md'
+          placeholder='Session Id'
+          type='text'
+          onChange={(e) => setSessionId(e.target.value)}
+        />
+      </div>
+
+      <div className='py-1'/>
+
       <input
-        className='primary-input'
-        placeholder='Session Id'
+        className='rounded-md'
+        placeholder='Password(Empty if None)'
         type='text'
+
+        //password doesnt do anything yet
         onChange={(e) => setSessionId(e.target.value)}
       />
+      <div className='py-1'/>
+
       <div className='centerize' style={{ marginBottom: 50 }}>
-        <button className='primary-button' onClick={GoToSession}>
+        <button className='primary-button bg-indigo-600 text-white hover:font-bold' onClick={GoToSession}>
           Go To Session
         </button>
       </div>
 
       <div className='centerize'>
-        <a href='/' className='primary-button button-imposter'>
+        <a href='/' className='primary-button button-imposter font-bold hover:font-semibold'>
           Back to main app
         </a>
       </div>
