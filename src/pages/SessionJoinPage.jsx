@@ -68,7 +68,7 @@ const SessionJoinPage = ({ DOMAIN }) => {
       <input
         className='rounded-md'
         placeholder='Password(Empty if None)'
-        type='text'
+        type='password'
 
         //password doesnt do anything yet
         onChange={(e) => setSessionId(e.target.value)}
