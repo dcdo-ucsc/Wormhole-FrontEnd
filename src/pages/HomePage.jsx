@@ -37,8 +37,13 @@ const HomePage = () => {
     <>
       <h1>Wormhole</h1>
       <p>{welcomeMessage}</p>
-      <button onClick={handleCreateSession}>Create Session</button>
-      <button onClick={handleJoinSession}>Join Session</button>
+      <div className='centerize' style={{ marginBottom: -1 }}>
+        <button className='primary-button bg-indigo-600 text-white hover:bg-indigo-500' onClick={handleCreateSession}>
+          Create a New Session
+        </button>
+      </div>
+
+      <button onClick={handleJoinSession}>Join Existing Session</button>
     </>
   );
 };
