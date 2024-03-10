@@ -31,7 +31,7 @@ const uploadFiles = async (files, sessionToken, fileCount) => {
 };
 
 const downloadFile = async (sessionId, sessionToken) => {
-  const res = await axios.get(backend + `/api/session/download`, {
+  const res = await axios.get(backend + `/api/files/download`, {
     withCredentials: true,
     headers: {
       Authorization: `Bearer ${sessionToken}`,
