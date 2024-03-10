@@ -25,7 +25,7 @@ const HomePage = () => {
 
   // Function to navigate to the Create Session page
   const handleCreateSession = () => {
-    navigate('/session/');
+    navigate('/create/');
   };
 
   // Function to navigate to the Join Session page
