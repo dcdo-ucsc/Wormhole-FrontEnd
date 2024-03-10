@@ -77,17 +77,35 @@ const SessionPage = () => {
   };
 
   const handleDownloadFiles = async () => {
-
     const sessionToken = Cookies.get(`token_${sessionId.current}`);
 
     console.log(sessionToken);
 
+    let response;
+
     try {
-      const response = await downloadFile(sessionId.current, sessionToken);
-      console.log("Download Success:", response);
+      response = await downloadFile(sessionId.current, sessionToken);
+      console.log('Download Success:', response);
     } catch (error) {
-      console.error("Download Error:", error);
+      console.error('Download Error:', error);
     }
+    const fileNameHeader = response.headers['content-disposition'];
+    const fileType = response.headers['Content-Type'];
+    const fileNameStart = fileNameHeader.indexOf('"') + 1;
+    const fileNameEnd = fileNameHeader.lastIndexOf('"');
+    const fileName = fileNameHeader.substring(fileNameStart, fileNameEnd);
+    // Create blob with file binary data
+    const blob = new Blob([response.data], { type: fileType });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    // set file attributes
+    link.href = url;
+    link.download = fileName;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   };
 
   return (
@@ -118,9 +136,7 @@ const SessionPage = () => {
         </div>
         <UploadForm sessionId={sessionId.current} />
       </div>
-      <button onClick={handleDownloadFiles}>
-        Download Files
-      </button>
+      <button onClick={handleDownloadFiles}>Download Files</button>
     </>
   );
 };
