@@ -40,3 +40,41 @@
 .read-the-docs {
   color: #888;
 }
+
+.qr-code-container {
+  display: grid;
+  place-items: center;
+}
+
+.session-input {
+  color: #333; /* Set the text color */
+  background-color: #fff; /* Set the background color */
+  border: 1px solid #ccc; /* Optional: Add a border */
+  padding: 0.5em; /* Add some padding */
+  margin-bottom: 1em; /* Add some space below the input */
+}
+
+.session-select {
+  color: #333; /* Set the text color */
+  background-color: #fff; /* Set the background color */
+  border: 1px solid #ccc; /* Optional: Add a border */
+  padding: 0.5em; /* Add some padding */
+  margin-bottom: 1em; /* Add some space below the select */
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column; /* Align children vertically */
+  align-items: center; /* Center items horizontally */
+  margin-bottom: 1em;
+}
+
+.session-input, .session-select, button {
+  margin: 0.5em 0; /* Add some vertical margin between elements */
+}
+
+.session-select {
+  padding: 0.5em; /* Increase padding to prevent text from touching edges */
+  width: auto; /* Adjust width as needed, could be 100% or a specific value */
+}
+
