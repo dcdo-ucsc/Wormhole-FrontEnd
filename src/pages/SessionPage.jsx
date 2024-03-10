@@ -3,11 +3,9 @@ import './index.css';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
-import { createSession } from '../api/sessionApi';
-import { UploadForm } from '../components/UploadForm';
 import { downloadFile } from '../api/fileApi';
-import { useLocation } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
+import { UploadForm } from '../components/UploadForm';
+import { useLocation, useParams } from 'react-router-dom';
 
 // Utils
 import { formatTime } from '../utils/time';
@@ -21,65 +19,70 @@ const SessionPage = () => {
   const [timer, setTimer] = useState(0);
   const intervalRef = useRef(null);
 
-  // IMPORTANT: timer goes twice as fast when <React.StrictMode> is enabled in main.jsx
-  // This won't happen if you build it and serve it in the backend
   useEffect(() => {
     const fetchData = async () => {
       if (!sessionId) {
         console.error('Session ID not found');
         return;
       }
-  
+
       try {
         const response = await axios.get(`${backend}/api/session/data/${sessionId}`, {
           withCredentials: true
         });
-  
+
         const { qrCodeDataURL, deletionTime } = response.data;
         setQrCodeDataUrl(qrCodeDataURL);
         setSessionUrl(`${window.location.origin}/session/${sessionId}`);
-        startTimer(deletionTime);
+        const deletionDate = new Date(deletionTime); // Ensure deletionTime is interpreted as a Date
+        startTimer(deletionDate);
       } catch (error) {
         console.error('Error fetching session data:', error);
       }
     };
-  
-    fetchData();
-  }, [sessionId]);
 
-  // Start the timer
-  const startTimer = (deletionTime) => {
-    const now = new Date().getTime();
-    const diff = deletionTime - now; // Correct calculation
+    fetchData();
+  }, [sessionId, backend]);
+
+  const startTimer = (deletionDate) => {
+    const now = new Date();
+    const diff = deletionDate - now; // Calculate the difference in milliseconds
     setTimer(Math.floor(diff / 1000)); // Convert to seconds
+
+    if (intervalRef.current) clearInterval(intervalRef.current); // Clear existing interval
 
     intervalRef.current = setInterval(() => {
       setTimer((prevTimer) => {
         if (prevTimer <= 1) {
           handleTimerExpiration();
-          return;
+          return 0; // Ensure the timer doesn't go into negative
         }
         return prevTimer - 1;
       });
     }, 1000);
   };
 
-  // Go back to the home page when timer expires
   const handleTimerExpiration = () => {
     clearInterval(intervalRef.current); // Clear the interval if timer is 0
+    // Consider using a more React-friendly way to navigate, such as useHistory from react-router-dom
     window.history.pushState(null, '', `${window.location.origin}`);
     window.location.reload();
   };
 
-  const handleDownloadFiles = async () => {
-    const sessionToken = Cookies.get(`token_${sessionId.current}`);
+  useEffect(() => {
+    // Cleanup on component unmount
+    return () => clearInterval(intervalRef.current);
+  }, []);
 
-    console.log(sessionToken);
+  const handleDownloadFiles = async () => {
+    const sessionToken = Cookies.get(`token_${sessionId}`);
+
+    console.log('token: ', sessionToken);
 
     let response;
 
     try {
-      response = await downloadFile(sessionId.current, sessionToken);
+      response = await downloadFile(sessionId, sessionToken);
       console.log('Download Success:', response);
     } catch (error) {
       console.error('Download Error:', error);
@@ -109,27 +112,17 @@ const SessionPage = () => {
       {qrCodeDataUrl && (
         <div className='qr-code-container'>
           <img src={qrCodeDataUrl} alt='QR Code' />
-          <p>
-            Session URL:{' '}
-            <a href={sessionUrl} target='_blank' rel='noopener noreferrer'>
-              {sessionUrl}
-            </a>
-          </p>
+          <p>Session URL: <a href={sessionUrl} target='_blank' rel='noopener noreferrer'>{sessionUrl}</a></p>
           <p>Expires in {formatTime(timer)}</p>
         </div>
       )}
       <p className='read-the-docs'>Scan QR Code to transfer files!</p>
 
       <div className='centerize'>
-        <a href='/' className='primary-button button-imposter'>
-          Back to main app
-        </a>
+        <a href='/' className='primary-button button-imposter'>Back to main app</a>
       </div>
       <div className='upload-container'>
-        <div style={{ textAlign: 'left' }}>
-          <label>Upload files</label>
-        </div>
-        <UploadForm sessionId={sessionId.current} />
+        <UploadForm sessionId={sessionId} />
       </div>
       <button onClick={handleDownloadFiles}>Download Files</button>
     </>
