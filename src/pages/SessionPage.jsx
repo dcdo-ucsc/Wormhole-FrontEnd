@@ -1,56 +1,51 @@
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import Cookies from 'js-cookie';
+import axios from 'axios';
 
 import { createSession } from '../api/sessionApi';
 import { UploadForm } from '../components/UploadForm';
 import { downloadFile } from '../api/fileApi';
 import { useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 // Utils
 import { formatTime } from '../utils/time';
 
+const backend = import.meta.env.VITE_BACKEND;
+
 const SessionPage = () => {
+  const { sessionId } = useParams(); 
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
   const [sessionUrl, setSessionUrl] = useState('');
   const [timer, setTimer] = useState(0);
   const intervalRef = useRef(null);
-  const sessionId = useRef(null);
 
   // IMPORTANT: timer goes twice as fast when <React.StrictMode> is enabled in main.jsx
   // This won't happen if you build it and serve it in the backend
   useEffect(() => {
     const fetchData = async () => {
-      let data;
-      try {
-        data = await createSession(60000, '');
-      } catch (err) {
-        console.error('Error creating session:', err);
-        return;
-      }
-
-      // Set the QR code and session URL
-      setQrCodeDataUrl(data.qrCodeDataURL);
-      const generatedSessionUrl = `${window.location.origin}/session/?sessionId=${data.sessionId}`;
-      setSessionUrl(generatedSessionUrl);
-
-      // Update URL with session ID
-      window.history.pushState(null, '', `?sessionId=${data.sessionId}`);
-
-      const urlParams = new URLSearchParams(window.location.search);
-      // Get session ID from the URL
-      sessionId.current = urlParams.get('sessionId');
-      console.log('Session ID:', sessionId.current);
-      if (!sessionId.current) {
+      if (!sessionId) {
         console.error('Session ID not found');
         return;
       }
-
-      startTimer(data.deletionTime);
+  
+      try {
+        const response = await axios.get(`${backend}/api/session/data/${sessionId}`, {
+          withCredentials: true
+        });
+  
+        const { qrCodeDataURL, deletionTime } = response.data;
+        setQrCodeDataUrl(qrCodeDataURL);
+        setSessionUrl(`${window.location.origin}/session/${sessionId}`);
+        startTimer(deletionTime);
+      } catch (error) {
+        console.error('Error fetching session data:', error);
+      }
     };
-
+  
     fetchData();
-  }, []);
+  }, [sessionId]);
 
   // Start the timer
   const startTimer = (deletionTime) => {
