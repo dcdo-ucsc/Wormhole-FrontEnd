@@ -23,18 +23,21 @@ const uploadFiles = async (files, sessionToken, fileCount) => {
         Authorization: `Bearer ${sessionToken}`,
       },
       params: {
-        fileCount: fileCount,
+        fileCount,
       },
     }
   );
   return res.data;
 };
 
-const downloadFile = async (sessionToken) => {
+const downloadFile = async (sessionId, sessionToken) => {
   const res = await axios.get(backend + `/api/session/download`, {
     withCredentials: true,
     headers: {
       Authorization: `Bearer ${sessionToken}`,
+    },
+    params: {
+      sessionId,
     },
   });
   return res.data;
