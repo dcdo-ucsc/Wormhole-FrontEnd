@@ -12,28 +12,6 @@ const SessionJoinPage = ({ DOMAIN }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const socket = new WebSocket(
-      `${DOMAIN.split('://')[0] === 'http' ? 'ws' : 'wss'}://${
-        DOMAIN.split('://')[1]
-      }`
-    );
-
-    socket.onopen = function (event) {
-      socket.send('hello');
-    };
-
-    socket.onmessage = function (event) {
-      let [code, message] = event.data.split(':');
-      console.log(code, message);
-      if (code === '1') {
-        setSessionJoinerValue(message);
-      } else if (code === '2') {
-        window.location.assign(`${DOMAIN}/session/${message}`);
-      }
-    };
-  }, []);
-
   const GoToSession = async () => {
     // TODO: add endpoint in backend to check if session exists
     // if not, show error message
