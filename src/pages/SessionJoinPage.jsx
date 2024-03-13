@@ -37,20 +37,6 @@ const SessionJoinPage = ({ DOMAIN }) => {
       <h2 className='font-semibold text-indigo-500'>
         The Seamless File Transfer Web App
       </h2>
-      {/* <div className='py-12'/> */}
-
-      {/* <p className='session-text'>Scan the QR Code from an active session</p>
-      {sessionJoinerValue ? (
-        <div className='qrcode-container'>
-          <QRCode value={sessionJoinerValue} />
-        </div>
-      ) : null} */}
-
-      {/* <p className='session-text'>Or enter in the code below</p>
-      <h2 className='session-title'>
-        {sessionJoinerValue || 'Awaiting join Id'}
-      </h2> */}
-
       <p className='font-semibold my-1'>Enter session details</p>
       <div>
         <div>
