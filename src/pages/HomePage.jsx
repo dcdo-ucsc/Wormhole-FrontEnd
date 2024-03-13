@@ -35,8 +35,8 @@ const HomePage = () => {
 
   return (
     <>
-      <h1>Wormhole</h1>
-      <p>{welcomeMessage}</p>
+      <h1 className='font-bold mb-3'>Wormhole</h1>
+      <p className='font-semibold'>{welcomeMessage}</p>
       <div className='centerize' style={{ marginBottom: -1 }}>
         <button className='primary-button bg-indigo-600 text-white hover:bg-indigo-500' onClick={handleCreateSession}>
           Create a New Session

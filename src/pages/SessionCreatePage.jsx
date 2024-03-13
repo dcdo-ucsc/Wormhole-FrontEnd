@@ -12,7 +12,7 @@ const SessionCreatePage = () => {
   const handleCreateSession = async () => {
     try {
       const data = await createSession(expirationTime, password);
-      navigate(`/session/${data.sessionId}`);
+      navigate(`/session/${data.sessionId}`, { state: { isOwner: true } });
     } catch (error) {
       console.error('Error creating session:', error);
     }
@@ -25,27 +25,38 @@ const SessionCreatePage = () => {
 
   return (
     <>
-      <h1>Wormhole</h1>
-      <p>Enter session details</p>
-      <div className="input-container">
+      <h1 className='font-bold mb-3'>Wormhole</h1>
+      <p className='font-semibold'>Enter session details</p>
+      <div className='input-container'>
         <input
-          className="session-input rounded-md"
-          type="password"
-          placeholder="Enter password"
+          className='session-input rounded-md'
+          type='password'
+          placeholder='Enter password'
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
         <select
-          className="rounded-md"
+          className='session-select rounded-md'
           value={expirationTime}
           onChange={handleExpirationChange} // Use the new handler
         >
-          <option value="">{expirationDisplay}</option>
-          <option value="1">1 minute</option>
-          <option value="5">5 minutes</option>
-          <option value="10">10 minutes</option>
+          <option value=''>{expirationDisplay}</option>
+          <option value='1'>1 minute</option>
+          <option value='5'>5 minutes</option>
+          <option value='10'>10 minutes</option>
         </select>
-        <button className= 'primary-button bg-indigo-600 text-white hover:bg-indigo-500' onClick={handleCreateSession}>Create Session</button>
+        <button
+          className='primary-button bg-indigo-600 text-white hover:bg-indigo-500'
+          onClick={handleCreateSession}
+        >
+          Create Session
+        </button>
+      </div>
+
+      <div className='centerize'>
+        <a href='/' className='primary-button font-bold hover:font-semibold'>
+          Back to main app
+        </a>
       </div>
     </>
   );

@@ -33,3 +33,15 @@
   justify-content: center;
   text-align: center;
 }
+
+.preview-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 8px;
+  border-radius: 8px;
+  border-style: dashed;
+  border-width: 1px;
+  border-color: whitesmoke;
+  padding: 10px 6px;
+}

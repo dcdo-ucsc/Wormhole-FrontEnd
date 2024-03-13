@@ -4,7 +4,10 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 
 import { downloadFile } from '../api/fileApi';
+import { fetchUserRole } from '../api/userApi';
+
 import { UploadForm } from '../components/UploadForm';
+import { PreviewPanel } from '../components/PreviewPanel';
 import { useLocation, useParams } from 'react-router-dom';
 
 // Utils
@@ -13,11 +16,36 @@ import { formatTime } from '../utils/time';
 const backend = import.meta.env.VITE_BACKEND;
 
 const SessionPage = () => {
+  const location = useLocation();
   const { sessionId } = useParams();
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
   const [sessionUrl, setSessionUrl] = useState('');
   const [timer, setTimer] = useState(0);
+  const [userRole, setUserRole] = useState('user');
   const intervalRef = useRef(null);
+
+  const fetchRole = async () => {
+    let isOwner = location.state.isOwner ? true : false;
+    let sessionToken;
+
+    // get token based on where prev route user came from
+    if (isOwner) {
+      sessionToken = Cookies.get(`token_owner_${sessionId}`);
+      console.log('isOwner: ', sessionToken);
+    } else {
+      sessionToken = Cookies.get(`token_user_${sessionId}`);
+      console.log('isUser: ', sessionToken);
+    }
+
+    const res = await fetchUserRole(sessionToken);
+
+    // set userRole
+    if (res.userRole) {
+      setUserRole(res.userRole);
+    } else {
+      console.error(res.error);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,6 +73,7 @@ const SessionPage = () => {
     };
 
     fetchData();
+    fetchRole();
   }, [sessionId, backend]);
 
   const startTimer = (deletionDate) => {
@@ -78,9 +107,9 @@ const SessionPage = () => {
   }, []);
 
   const handleDownloadFiles = async () => {
-    const sessionToken = Cookies.get(`token_${sessionId}`);
-
-    console.log('token: ', sessionToken);
+    let sessionToken = Cookies.get(`token_owner_${sessionId}`)
+      ? Cookies.get(`token_owner_${sessionId}`)
+      : Cookies.get(`token_user_${sessionId}`);
 
     let response;
 
@@ -131,10 +160,18 @@ const SessionPage = () => {
           Back to main app
         </a>
       </div>
-      <div className='upload-container'>
-        <UploadForm sessionId={sessionId} />
-      </div>
+
+      {userRole === 'owner' && (
+        <div className='upload-container'>
+          <UploadForm sessionId={sessionId} />
+        </div>
+      )}
+
       <button onClick={handleDownloadFiles}>Download Files</button>
+
+      <div>
+        <PreviewPanel sessionId={sessionId} />
+      </div>
     </>
   );
 };

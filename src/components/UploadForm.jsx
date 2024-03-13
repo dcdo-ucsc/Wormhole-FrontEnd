@@ -8,11 +8,7 @@ import { fileUpload, uploadSvg } from '../assets/svg/fileUpload';
 const UploadForm = (sessionId) => {
   const [fileNames, setfileNames] = useState([]); // preview files
   const [files, setFiles] = useState([]);
-
-  useEffect(() => {
-    console.log(files);
-    console.log(fileNames);
-  }, [files, fileNames]);
+  const [uploadMessage, setUploadMessage] = useState(null);
 
   const handleFileSelect = (event) => {
     const fileNames = Array.from(event.target.files).map((file) => file.name);
@@ -32,12 +28,13 @@ const UploadForm = (sessionId) => {
 
   const handleUpload = async () => {
     // Get session token from cookies
-
-    const sessionToken = Cookies.get(`token_${sessionId.sessionId}`);
+    let sessionToken = Cookies.get(`token_owner_${sessionId.sessionId}`);
+    
+    console.log(sessionToken)
 
     try {
       await uploadFiles(files, sessionToken, files.length);
-      console.log('Files uploaded!');
+      setUploadMessage('Files uploaded!');
     } catch (err) {
       // empty file if 413 error occurs
       setFiles([]);
@@ -47,36 +44,44 @@ const UploadForm = (sessionId) => {
     setFiles([]);
   };
 
+  // FIXME: dashed borders not visible on light theme
   return (
-    <div
-      className='upload-form'
-      onDragOver={(e) => e.preventDefault()}
-      onDrop={handleDrop}
-    >
-      <div>
-        <div>
-          {uploadSvg}
-          <div className='text-center'>
-            <label htmlFor='file-upload' className='upload-form-label'>
-              <span>Upload a file</span>
-              <input
-                style={{ display: 'none' }}
-                id='file-upload'
-                name='file-upload'
-                multiple
-                type='file'
-                onChange={handleFileSelect}
-              />
-            </label>
-            <p style={{ paddingLeft: '4px' }}>or drag and drop</p>
+    <>
+      <div
+        className='upload-form'
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={handleDrop}
+      >
+        {/* Drag and drop area / upload */}
+        <div className='flex justify-center'>
+          <div>
+            {/* Image */}
+            {uploadSvg}
+            <div className='text-center'>
+              <label htmlFor='file-upload' className='upload-form-label'>
+                <span>Upload a file</span>
+                <input
+                  style={{ display: 'none' }}
+                  id='file-upload'
+                  name='file-upload'
+                  multiple
+                  type='file'
+                  onChange={handleFileSelect}
+                />
+              </label>
+              <p style={{ paddingLeft: '4px' }}>or drag and drop</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <label htmlFor='contained-button-file'>
-        <button onClick={handleUpload}>Upload</button>
-      </label>
-    </div>
+        {/* Upload btn */}
+        <label htmlFor='contained-button-file'>
+          <button onClick={handleUpload}>Upload</button>
+        </label>
+      </div>
+      
+      {uploadMessage && <div className='font-semibold'>{uploadMessage}</div>}
+    </>
   );
 };
 
