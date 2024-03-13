@@ -7,10 +7,16 @@ const SessionCreatePage = () => {
   const [password, setPassword] = useState('');
   const [expirationTime, setExpirationTime] = useState('');
   const [expirationDisplay, setExpirationDisplay] = useState('Set Expiry'); // New state for display text
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleCreateSession = async () => {
     try {
+      // check if the expiration time is valid
+      if (expirationTime === '') {
+        setError('Select a valid expiration time');
+        throw error;
+      }
       const data = await createSession(expirationTime, password);
       navigate(`/session/${data.sessionId}`, { state: { isOwner: true } });
     } catch (error) {
@@ -45,6 +51,9 @@ const SessionCreatePage = () => {
           <option value='5'>5 minutes</option>
           <option value='10'>10 minutes</option>
         </select>
+
+        {error && <div className='text-red-600'>{error}</div>}
+
         <button
           className='primary-button bg-indigo-600 text-white hover:bg-indigo-500'
           onClick={handleCreateSession}
