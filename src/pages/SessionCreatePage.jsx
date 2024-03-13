@@ -24,6 +24,8 @@ const SessionCreatePage = () => {
     }
   };
   const handleExpirationChange = (e) => {
+    // reset error message when user choose anything other than default text
+    setError(null);
     const minutes = e.target.value;
     setExpirationTime(minutes * 60 * 1000); // Convert minutes to milliseconds and set expirationTime
     setExpirationDisplay(minutes ? `${minutes} minute(s)` : ''); // Update display text based on selection
@@ -52,7 +54,7 @@ const SessionCreatePage = () => {
           <option value='10'>10 minutes</option>
         </select>
 
-        {error && <div className='text-red-600'>{error}</div>}
+        {error && <div className='text-red-600 font-semibold'>{error}</div>}
 
         <button
           className='primary-button bg-indigo-600 text-white hover:bg-indigo-500'

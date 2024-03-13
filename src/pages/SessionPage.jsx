@@ -22,6 +22,8 @@ const SessionPage = () => {
   const [sessionUrl, setSessionUrl] = useState('');
   const [timer, setTimer] = useState(0);
   const [userRole, setUserRole] = useState('user');
+  const [error, setError] = useState(false);
+  const [downloadMsg, setDownloadMsg] = useState(false);
   const intervalRef = useRef(null);
 
   const fetchRole = async () => {
@@ -107,6 +109,7 @@ const SessionPage = () => {
   }, []);
 
   const handleDownloadFiles = async () => {
+    // Get either user or owner token, both are already allowed to download
     let sessionToken = Cookies.get(`token_owner_${sessionId}`)
       ? Cookies.get(`token_owner_${sessionId}`)
       : Cookies.get(`token_user_${sessionId}`);
@@ -115,8 +118,12 @@ const SessionPage = () => {
 
     try {
       response = await downloadFile(sessionId, sessionToken);
+      setDownloadMsg('Download Success!');
+      setError(false);
       console.log('Download Success:', response);
     } catch (error) {
+      setDownloadMsg('No files to download');
+      setError(true);
       console.error('Download Error:', error);
     }
     const fileNameHeader = response.headers['content-disposition'];
@@ -166,6 +173,9 @@ const SessionPage = () => {
           <UploadForm sessionId={sessionId} />
         </div>
       )}
+
+      {error && <div className='text-red-600 font-semibold mt-1'>{downloadMsg}</div>}
+      {!error && downloadMsg && <div className='text-green-400 font-semibold mt-1'>{downloadMsg}</div>}
 
       <button onClick={handleDownloadFiles}>Download Files</button>
 

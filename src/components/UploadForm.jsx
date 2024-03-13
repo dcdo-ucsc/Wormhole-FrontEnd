@@ -9,6 +9,7 @@ const UploadForm = (sessionId) => {
   const [fileNames, setfileNames] = useState([]); // preview files
   const [files, setFiles] = useState([]);
   const [uploadMessage, setUploadMessage] = useState(null);
+  const [error, setError] = useState(false);
 
   const handleFileSelect = (event) => {
     const fileNames = Array.from(event.target.files).map((file) => file.name);
@@ -27,14 +28,20 @@ const UploadForm = (sessionId) => {
   };
 
   const handleUpload = async () => {
+    // if no files are selected, throw error message
+    if (files.length === 0) {
+      setUploadMessage('No files selected');
+      setError(true);
+      throw Error;
+    }
+
     // Get session token from cookies
     let sessionToken = Cookies.get(`token_owner_${sessionId.sessionId}`);
-    
-    console.log(sessionToken)
 
     try {
       await uploadFiles(files, sessionToken, files.length);
       setUploadMessage('Files uploaded!');
+      setError(false);
     } catch (err) {
       // empty file if 413 error occurs
       setFiles([]);
@@ -79,8 +86,11 @@ const UploadForm = (sessionId) => {
           <button onClick={handleUpload}>Upload</button>
         </label>
       </div>
-      
-      {uploadMessage && <div className='font-semibold'>{uploadMessage}</div>}
+
+      {error && (
+        <div className='font-semibold text-red-600'>{uploadMessage}</div>
+      )}
+      {!error && uploadMessage && <div className='font-semibold'>{uploadMessage}</div>}
     </>
   );
 };
