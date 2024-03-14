@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import './index.css';
 
-// import { getFileNames, getFilePreview } from '../api/fileApi';
-
-const backend = import.meta.env.VITE_BACKEND;
+import { getFileNames } from '../api/sessionApi';
 
 const PreviewPanel = (sessionId) => {
   const [fileNames, setFileNames] = useState([]); // preview files
+  const [errorMsg, setErrorMsg] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -17,15 +15,13 @@ const PreviewPanel = (sessionId) => {
   const fetchFileNames = async () => {
     let response;
     try {
-      response = await axios.get(
-        `${backend}/api/session/getFileNames/${sessionId.sessionId}`,
-        {
-          withCredentials: true,
-        }
-      );
-      setFileNames(response.data);
+      response = await getFileNames(sessionId);
+      setError(false);
+      setErrorMsg(null);
+      setFileNames(response);
     } catch (error) {
       setError(true);
+      setErrorMsg('No files in session');
     }
   };
 
@@ -43,6 +39,9 @@ const PreviewPanel = (sessionId) => {
             </label>
           ))}
         </div>
+
+        {error && <div>{errorMsg}</div>}
+
         <label htmlFor='contained-button-file'>
           <button onClick={handleFilePreview}>get file names</button>
         </label>

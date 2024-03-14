@@ -1,5 +1,5 @@
 import './index.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import HomePage from './pages/HomePage.jsx';
 import SessionPage from './pages/SessionPage.jsx';
@@ -12,6 +12,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path='*' element={<Navigate to='/' />} />
         <Route path='/' element={<HomePage DOMAIN={DOMAIN} />} />
         <Route path='/join' element={<SessionJoinPage DOMAIN={DOMAIN} />} />
         <Route path='/create/' element={<SessionCreatePage DOMAIN={DOMAIN} />} />

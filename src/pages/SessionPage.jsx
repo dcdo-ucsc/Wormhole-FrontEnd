@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import Cookies from 'js-cookie';
-import axios from 'axios';
 
+import { getSessionData } from '../api/sessionApi';
 import { downloadFile } from '../api/fileApi';
 import { fetchUserRole } from '../api/userApi';
 
@@ -27,53 +27,47 @@ const SessionPage = () => {
   const intervalRef = useRef(null);
 
   const fetchRole = async () => {
-    let isOwner = location.state.isOwner ? true : false;
+    /*  if user came from /join, then they are a user
+        if user came from /create, then they are an owner */
+    const isOwner = location.state.isOwner ? true : false;
     let sessionToken;
 
-    // get token based on where prev route user came from
+    // get token based on how its stored in cookies
     if (isOwner) {
       sessionToken = Cookies.get(`token_owner_${sessionId}`);
-      console.log('isOwner: ', sessionToken);
     } else {
       sessionToken = Cookies.get(`token_user_${sessionId}`);
-      console.log('isUser: ', sessionToken);
     }
 
-    const res = await fetchUserRole(sessionToken);
-
-    // set userRole
-    if (res.userRole) {
+    // get user role using token
+    try {
+      const res = await fetchUserRole(sessionToken);
       setUserRole(res.userRole);
-    } else {
-      console.error(res.error);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchData = async () => {
+    if (!sessionId) {
+      console.error('Session ID not found');
+      return;
+    }
+
+    try {
+      const response = await getSessionData(sessionId);
+
+      const { qrCodeDataURL, deletionTime } = response;
+      setQrCodeDataUrl(qrCodeDataURL);
+      setSessionUrl(`${window.location.origin}/session/${sessionId}`);
+      const deletionDate = new Date(deletionTime); // Ensure deletionTime is interpreted as a Date
+      startTimer(deletionDate);
+    } catch (error) {
+      console.error('Error fetching session data:', error);
     }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!sessionId) {
-        console.error('Session ID not found');
-        return;
-      }
-
-      try {
-        const response = await axios.get(
-          `${backend}/api/session/data/${sessionId}`,
-          {
-            withCredentials: true,
-          }
-        );
-
-        const { qrCodeDataURL, deletionTime } = response.data;
-        setQrCodeDataUrl(qrCodeDataURL);
-        setSessionUrl(`${window.location.origin}/session/${sessionId}`);
-        const deletionDate = new Date(deletionTime); // Ensure deletionTime is interpreted as a Date
-        startTimer(deletionDate);
-      } catch (error) {
-        console.error('Error fetching session data:', error);
-      }
-    };
-
     fetchData();
     fetchRole();
   }, [sessionId, backend]);
@@ -120,11 +114,14 @@ const SessionPage = () => {
       response = await downloadFile(sessionId, sessionToken);
       setDownloadMsg('Download Success!');
       setError(false);
-      console.log('Download Success:', response);
     } catch (error) {
-      setDownloadMsg('No files to download');
       setError(true);
-      console.error('Download Error:', error);
+      // Missing access token
+      if (error.response.status === 401) {
+        setDownloadMsg('Permission Denied');
+      } else if (error.response.status === 404) {
+        setDownloadMsg('No files to download');
+      }
     }
     const fileNameHeader = response.headers['content-disposition'];
     const fileType = response.headers['content-type'];
@@ -174,8 +171,12 @@ const SessionPage = () => {
         </div>
       )}
 
-      {error && <div className='text-red-600 font-semibold mt-1'>{downloadMsg}</div>}
-      {!error && downloadMsg && <div className='text-green-400 font-semibold mt-1'>{downloadMsg}</div>}
+      {error && (
+        <div className='text-red-600 font-semibold mt-1'>{downloadMsg}</div>
+      )}
+      {!error && downloadMsg && (
+        <div className='text-green-400 font-semibold mt-1'>{downloadMsg}</div>
+      )}
 
       <button onClick={handleDownloadFiles}>Download Files</button>
 
