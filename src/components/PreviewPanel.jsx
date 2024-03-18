@@ -15,7 +15,7 @@ const PreviewPanel = (sessionId) => {
   const fetchFileNames = async () => {
     let response;
     try {
-      response = await getFileNames(sessionId);
+      response = await getFileNames(sessionId.sessionId);
       setError(false);
       setErrorMsg(null);
       setFileNames(response);
